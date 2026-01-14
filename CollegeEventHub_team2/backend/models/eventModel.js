@@ -1,0 +1,62 @@
+
+import mongoose from "mongoose";
+
+const eventSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  category: { type: String, required: true },
+  capacity: { type: Number, required: true },
+  startDate: { type: Date, required: true },
+  endDate: { type: Date, required: true },
+  startTime: { type: String, required: true },
+  endTime: { type: String, required: true },
+  venue: { type: String, required: true },
+  price: { type: Number, default: 0 },
+  regDeadline: { type: Date },
+  image: { type: String },
+  requirements: { type: String },
+  tags: [String],
+
+  createdBy: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "User", 
+    required: true 
+  },
+  creatorName: { type: String, required: true }, // Store creator name for easier access
+
+  createdAt: { type: Date, default: Date.now },
+  draft: { type: Boolean, default: false },
+  published: { type: Boolean, default: false },
+  
+  // These will be calculated dynamically
+  registeredCount: { type: Number, default: 0 },
+  reviewCount: { type: Number, default: 0 },
+  averageRating: { type: Number, default: 0 }
+}, { timestamps: true });
+
+
+/* 🔥 ADD INDEXES HERE (VERY IMPORTANT) */
+eventSchema.index({ published: 1, createdAt: -1 });
+
+/* OPTIONAL BUT GOOD (future filtering/search) */
+eventSchema.index({ category: 1 });
+eventSchema.index({ startDate: 1 });
+
+
+// Virtual for checking if user is registered (if needed)
+eventSchema.virtual('actualRegisteredCount').get(function() {
+  return this.registeredCount || 0;
+});
+
+// Ensure virtuals are included in JSON
+eventSchema.set('toJSON', { virtuals: true });
+eventSchema.set('toObject', { virtuals: true });
+
+eventSchema.pre('save', function(next) {
+  if (this.isModified('draft')) {
+    this.published = !this.draft;
+  }
+  next();
+});
+
+export default mongoose.model("Event", eventSchema);
