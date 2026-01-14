@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const connectDB = async () => {
     
-    console.log("Attempting to connect with URI:", process.env.MONGODB_URI);
+    console.log("Attempting to connect with URI:", process.env.MONGODB_URL);
 
     try {
         mongoose.connection.on('connected', () => console.log("Database Connected"));
