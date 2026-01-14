@@ -35,11 +35,6 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-app.options("*", cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true
-}));
-
 //API Endpoints
 app.get('/',(req,res)=>{
     res.send("API is working");
